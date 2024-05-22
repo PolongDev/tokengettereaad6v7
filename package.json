@@ -1,0 +1,13 @@
+{
+  "name": "facebook-access-token-getter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "axios": "^0.21.1",
+    "uuid": "^8.3.2"
+  }
+}

